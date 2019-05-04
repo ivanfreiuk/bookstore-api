@@ -1,6 +1,8 @@
-﻿using BookStore.BusinessLogic.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+﻿using System.Threading.Tasks;
+using BookStore.DataAccess.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookStore.Controllers
 {
@@ -9,25 +11,25 @@ namespace BookStore.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly UserManager<User> _userManager;
 
-        public UsersController(IUserService userService)
+        public UsersController(UserManager<User> userManager)
         {
-            _userService = userService;
+            _userManager = userManager;
         }
         
         //[Authorize(Roles = Role.Admin)]
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var users = _userService.GetAllUsers();
+            var users = await _userManager.Users.AllAsync(i => true);
             return new JsonResult(users);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetUsers(int id)
+        public async Task<IActionResult> GetUsers(int id)
         {
-            var user = _userService.GetUser(id);
+            var user = await _userManager.Users.FirstOrDefaultAsync(u=> u.Id == id);
 
             if (user == null)
             {

@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using BookStore.BusinessLogic.Interfaces;
-using BookStore.DataAccess.Entities;
+using BookStore.DataAccess.Identity;
 using BookStore.DataAccess.UnitOfWork;
 
 namespace BookStore.BusinessLogic.Services
@@ -12,30 +15,35 @@ namespace BookStore.BusinessLogic.Services
         {
 
         }
-        
-        public User GetUser(int id)
+       
+        public async Task<User> GetUserAsync(int id)
         {
-            return _uow.Users.Get(id);
+            return await _uow.Users.GetAsync(id);
         }
 
-        public ICollection<User> GetAllUsers()
+        public async Task<ICollection<User>> GetAllUsersAsync()
         {
-            return _uow.Users.GetAll();
+            return await _uow.Users.GetAllAsync();
         }
 
-        public void Create(User user)
+        public async Task<ICollection<User>> FindAsync(Expression<Func<User, bool>> predicate)
         {
-            _uow.Users.Add(user);
+           return await _uow.Users.FindAsync(predicate);
         }
 
-        public void Update(User user)
+        public async Task AddUserAsync(User user)
         {
-            _uow.Users.Update(user);
+            await _uow.Users.AddAsync(user);
         }
 
-        public void Remove(User user)
+        public async Task RemoveUserAsync(User user)
         {
-            _uow.Users.Remove(user);
+            await _uow.Users.RemoveAsync(user);
+        }
+
+        public async Task UpdateUserAsync(User user)
+        {
+            await _uow.Users.UpdateAsync(user);
         }
     }
 }

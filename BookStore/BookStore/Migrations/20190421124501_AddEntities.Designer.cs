@@ -4,14 +4,16 @@ using BookStore.DataAccess.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BookStore.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    partial class StoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190421124501_AddEntities")]
+    partial class AddEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,13 +40,7 @@ namespace BookStore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Description");
-
                     b.Property<string>("ImageUrl");
-
-                    b.Property<string>("Language");
-
-                    b.Property<int>("PageSize");
 
                     b.Property<decimal>("Price");
 
@@ -81,6 +77,28 @@ namespace BookStore.Migrations
                     b.ToTable("BookCategory");
                 });
 
+            modelBuilder.Entity("BookStore.DataAccess.Entities.BookDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BookId");
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("Language");
+
+                    b.Property<int>("PageSize");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId")
+                        .IsUnique();
+
+                    b.ToTable("BookDetails");
+                });
+
             modelBuilder.Entity("BookStore.DataAccess.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -100,6 +118,8 @@ namespace BookStore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int?>("BookDetailId");
+
                     b.Property<int>("BookId");
 
                     b.Property<string>("Content");
@@ -107,6 +127,8 @@ namespace BookStore.Migrations
                     b.Property<DateTime>("PublicationDate");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BookDetailId");
 
                     b.HasIndex("BookId");
 
@@ -309,10 +331,22 @@ namespace BookStore.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("BookStore.DataAccess.Entities.Comment", b =>
+            modelBuilder.Entity("BookStore.DataAccess.Entities.BookDetail", b =>
                 {
                     b.HasOne("BookStore.DataAccess.Entities.Book", "Book")
+                        .WithOne("BookDetail")
+                        .HasForeignKey("BookStore.DataAccess.Entities.BookDetail", "BookId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("BookStore.DataAccess.Entities.Comment", b =>
+                {
+                    b.HasOne("BookStore.DataAccess.Entities.BookDetail")
                         .WithMany("Comments")
+                        .HasForeignKey("BookDetailId");
+
+                    b.HasOne("BookStore.DataAccess.Entities.Book", "Book")
+                        .WithMany()
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

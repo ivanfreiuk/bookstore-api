@@ -3,11 +3,9 @@ using BookStore.BusinessLogic.Interfaces;
 using BookStore.BusinessLogic.Services;
 using BookStore.DataAccess.Context;
 using BookStore.DataAccess.Entities;
-using BookStore.DataAccess.Repositories;
-using BookStore.DataAccess.Repositories.Interfaces;
+using BookStore.DataAccess.Identity;
 using BookStore.DataAccess.UnitOfWork;
 using BookStore.Helpers;
-using BookStore.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -28,53 +26,75 @@ namespace BookStore
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            #region Add CORS
+
             services.AddCors();
 
+            #endregion
 
-            string connection = Configuration.GetConnectionString("DefaultConnection");
+            #region Add Entity Framework and Identity Framework
+
             services.AddDbContext<StoreDbContext>(options =>
-                options.UseSqlServer(connection,
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
                     b => b.MigrationsAssembly("BookStore")));
-            services.AddIdentity<User, Role>()
-                .AddEntityFrameworkStores<StoreDbContext>();
+
+            services.AddIdentity<User, Role>(options =>
+            {
+                options.User.RequireUniqueEmail = false;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 3;
+            }).AddEntityFrameworkStores<StoreDbContext>();
+
+            #endregion
+
+            #region Add Authentication
+
+            var appSettings = Configuration.GetSection("TokenSettings");
+            services.Configure<TokenSettings>(appSettings);
+
+
+            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenSettings:Key"]));
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(config =>
+            {
+                config.RequireHttpsMetadata = false;
+                config.SaveToken = true;
+                config.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    IssuerSigningKey = signingKey,
+                    ValidateAudience = true,
+                    ValidAudience = Configuration["TokenSettings:Audience"],
+                    ValidateIssuer = true,
+                    ValidIssuer = Configuration["TokenSettings:Issuer"],
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true
+                };
+            });
+
+            #endregion
+
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            
-            // configure strongly typed settings objects
-            var appSettingsSection = Configuration.GetSection("AppSettings");
-            services.Configure<AppSettings>(appSettingsSection);
-            
-            // configure jwt authentication
-            var appSettings = appSettingsSection.Get<AppSettings>();
-            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-            services.AddAuthentication(x =>
-                {
-                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-                .AddJwtBearer(x =>
-                {
-                    x.RequireHttpsMetadata = false;
-                    x.SaveToken = true;
-                    x.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
-                        ValidateIssuer = false,
-                        ValidateAudience = false
-                    };
-                });
 
-            // configure DI for application services
+            #region Add DI for application services
+
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IBookService, BookService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<TokenHelper>();
+
+            #endregion
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())

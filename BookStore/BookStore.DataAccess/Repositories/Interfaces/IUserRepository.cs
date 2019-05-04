@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using BookStore.DataAccess.Entities;
+﻿using BookStore.DataAccess.Identity;
 
 namespace BookStore.DataAccess.Repositories.Interfaces
 {

@@ -1,12 +1,12 @@
 ﻿using BookStore.DataAccess.Context;
-using BookStore.DataAccess.Identity;
+using BookStore.DataAccess.Entities;
 using BookStore.DataAccess.Repositories.Interfaces;
 
 namespace BookStore.DataAccess.Repositories
 {
-    public class UserRepository: BaseRepository<User>, IUserRepository
+    public class BookRepository: BaseRepository<Book>, IBookRepository
     {
-        public UserRepository(StoreDbContext context): base(context)
+        public BookRepository(StoreDbContext context): base(context)
         {
             
         }

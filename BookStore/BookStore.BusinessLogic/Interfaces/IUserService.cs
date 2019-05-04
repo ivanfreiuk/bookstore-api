@@ -1,18 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using BookStore.DataAccess.Entities;
+using BookStore.DataAccess.Identity;
 
 namespace BookStore.BusinessLogic.Interfaces
 {
     public interface IUserService
     {
-        User GetUser(int id);
+        Task<User> GetUserAsync(int id);
+        Task<ICollection<User>> GetAllUsersAsync();
+        Task<ICollection<User>> FindAsync(Expression<Func<User, bool>> predicate);
 
-        ICollection<User> GetAllUsers();
+        Task AddUserAsync(User user);
 
-        void Create(User user);
+        Task RemoveUserAsync(User user);
 
-        void Update(User user);
-
-        void Remove(User user);
+        Task UpdateUserAsync(User user);
     }
 }
