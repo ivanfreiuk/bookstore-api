@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BookStore.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/books")]
     [ApiController]
     public class  BooksController : ControllerBase
     {
@@ -17,25 +17,10 @@ namespace BookStore.Controllers
             _bookService = bookService;
         }
 
-        [HttpGet]
-        [Route("detail")]
+        [HttpGet()]
         public async Task<IActionResult> GetBooks()
         {
             var books = await _bookService.GetAllBooksAsync();
-
-            if (books == null)
-            {
-                return NoContent();
-            }
-
-            return Ok(books);
-        }
-
-
-        [HttpGet]
-        public async Task<IActionResult> GetShortDetailBooks()
-        {
-            var books = await _bookService.GetShortDetailBooksAsync();
 
             if (books == null)
             {
@@ -110,7 +95,7 @@ namespace BookStore.Controllers
                 return BadRequest();
             }
 
-            await _bookService.RemoveBookAsync(book);
+            await _bookService.RemoveBookAsync(id);
 
             return Ok(book);
         }

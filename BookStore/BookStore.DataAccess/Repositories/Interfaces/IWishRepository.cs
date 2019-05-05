@@ -2,8 +2,8 @@
 
 namespace BookStore.DataAccess.Repositories.Interfaces
 {
-    //public interface IBookDetailRepository : IGenericRepository<BookDetail>
-    //{
-
-    //}
+    public interface IWishRepository: IGenericRepository<Wish>
+    {
+        
+    }
 }

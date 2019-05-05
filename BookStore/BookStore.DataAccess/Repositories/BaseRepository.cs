@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using BookStore.DataAccess.Context;
 using BookStore.DataAccess.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,9 +11,9 @@ namespace BookStore.DataAccess.Repositories
 {
     public class BaseRepository<TEntity> : IDisposable, IGenericRepository<TEntity> where TEntity: class
     {
-        protected readonly DbContext _context;
+        protected readonly StoreDbContext _context;
 
-        public BaseRepository(DbContext context)
+        public BaseRepository(StoreDbContext context)
         {
             _context = context;
         }

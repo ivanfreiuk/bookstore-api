@@ -1,5 +1,8 @@
 ﻿using System.Text;
+using AutoMapper;
 using BookStore.BusinessLogic.Interfaces;
+using BookStore.BusinessLogic.Models;
+using BookStore.BusinessLogic.Profiles;
 using BookStore.BusinessLogic.Services;
 using BookStore.DataAccess.Context;
 using BookStore.DataAccess.Entities;
@@ -9,6 +12,7 @@ using BookStore.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -48,7 +52,7 @@ namespace BookStore
                 options.Password.RequireUppercase = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequiredLength = 3;
-            }).AddEntityFrameworkStores<StoreDbContext>();
+            }).AddEntityFrameworkStores<StoreDbContext>().AddDefaultTokenProviders();
 
             #endregion
 
@@ -87,10 +91,29 @@ namespace BookStore
 
             #region Add DI for application services
 
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IBookService, BookService>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<TokenHelper>();
+
+            #endregion
+
+            #region AutoMapper
+
+            var serviceProvider = services.BuildServiceProvider();
+            AutoMapper.Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<Author, AuthorDto>();
+                cfg.CreateMap<AuthorDto, Author>();
+                cfg.CreateMap<Category, CategoryDto>();
+                cfg.CreateMap<CategoryDto, Category>();
+                cfg.CreateMap<Book, BookDto>();
+                cfg.AddProfile(new BookProfile(serviceProvider.GetService<IUnitOfWork>()));
+            });
+
+            services.AddSingleton(Mapper.Instance);
 
             #endregion
         }

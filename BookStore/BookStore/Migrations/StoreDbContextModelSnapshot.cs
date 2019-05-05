@@ -15,7 +15,7 @@ namespace BookStore.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -106,11 +106,39 @@ namespace BookStore.Migrations
 
                     b.Property<DateTime>("PublicationDate");
 
+                    b.Property<int>("UserId");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BookId");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("BookStore.DataAccess.Entities.Mark", b =>
+                {
+                    b.Property<int>("BookId");
+
+                    b.Property<int>("UserId");
+
+                    b.Property<int>("MarkValue");
+
+                    b.HasKey("BookId", "UserId");
+
+                    b.ToTable("Marks");
+                });
+
+            modelBuilder.Entity("BookStore.DataAccess.Entities.Wish", b =>
+                {
+                    b.Property<int>("BookId");
+
+                    b.Property<int>("UserId");
+
+                    b.HasKey("BookId", "UserId");
+
+                    b.ToTable("Wishes");
                 });
 
             modelBuilder.Entity("BookStore.DataAccess.Identity.Role", b =>
@@ -314,6 +342,11 @@ namespace BookStore.Migrations
                     b.HasOne("BookStore.DataAccess.Entities.Book", "Book")
                         .WithMany("Comments")
                         .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("BookStore.DataAccess.Identity.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

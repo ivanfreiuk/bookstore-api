@@ -13,6 +13,8 @@ namespace BookStore.DataAccess.UnitOfWork
         private IAuthorRepository _authorRepository;
         private ICategoryRepository _categoryRepository;
         private ICommentRepository _commentRepository;
+        private IMarkRepository _markRepository;
+        private IWishRepository _wishRepository;
         private readonly StoreDbContext _context;
         private bool disposed;
 
@@ -31,6 +33,10 @@ namespace BookStore.DataAccess.UnitOfWork
         public ICommentRepository Comments => _commentRepository ?? (_commentRepository = new CommentRepository(_context));
 
         public ICategoryRepository Categories => _categoryRepository ?? (_categoryRepository = new CategoryRepository(_context));
+
+        public IMarkRepository Marks => _markRepository ?? (_markRepository = new MarkRepository(_context));
+
+        public IWishRepository Wishes => _wishRepository ?? (_wishRepository = new WishRepository(_context));
 
         public async Task<int> SaveAsync()
         {

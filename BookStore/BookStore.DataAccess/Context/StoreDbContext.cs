@@ -15,6 +15,10 @@ namespace BookStore.DataAccess.Context
 
         public DbSet<Category> Categories { get; set; }
 
+        public DbSet<Mark> Marks { get; set; }
+
+        public DbSet<Wish> Wishes { get; set; }
+
         public StoreDbContext(DbContextOptions<StoreDbContext> options)
             : base(options)
         {
@@ -24,10 +28,11 @@ namespace BookStore.DataAccess.Context
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
             #region BookCategory
 
             builder.Entity<BookCategory>()
-                .HasKey(bc => new { bc.BookId, bc.CategoryId });
+                .HasKey(bc => new {bc.BookId, bc.CategoryId});
             builder.Entity<BookCategory>()
                 .HasOne(bc => bc.Book)
                 .WithMany(b => b.BookCategories)
@@ -42,7 +47,7 @@ namespace BookStore.DataAccess.Context
             #region BookAuthor
 
             builder.Entity<BookAuthor>()
-                .HasKey(ba => new { ba.BookId, ba.AuthorId });
+                .HasKey(ba => new {ba.BookId, ba.AuthorId});
             builder.Entity<BookAuthor>()
                 .HasOne(ba => ba.Book)
                 .WithMany(b => b.BookAuthors)
@@ -51,6 +56,24 @@ namespace BookStore.DataAccess.Context
                 .HasOne(ba => ba.Author)
                 .WithMany(a => a.BookAuthors)
                 .HasForeignKey(ba => ba.AuthorId);
+
+            #endregion
+
+            #region Wish
+
+            builder.Entity<Wish>().HasKey(w => new
+            {
+                w.BookId, w.UserId
+            });
+
+            #endregion
+
+            #region Mark
+
+            builder.Entity<Mark>().HasKey(w => new
+            {
+                w.BookId, w.UserId
+            });
 
             #endregion
         }

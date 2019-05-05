@@ -18,12 +18,11 @@ namespace BookStore.Controllers
             _userManager = userManager;
         }
         
-        //[Authorize(Roles = Role.Admin)]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var users = await _userManager.Users.AllAsync(i => true);
-            return new JsonResult(users);
+            return Ok(users);
         }
 
         [HttpGet("{id}")]

@@ -9,14 +9,15 @@ namespace BookStore.BusinessLogic.Interfaces
 {
     public interface IBookService
     {
-        Task<Book> GetBookAsync(int id);
-        Task<ICollection<Book>> GetAllBooksAsync();
-        Task<ICollection<BookShortDetail>> GetShortDetailBooksAsync();
-        Task<ICollection<Book>> FindAsync(Expression<Func<Book, bool>> predicate);
+        Task<BookDto> GetBookAsync(int id);
 
+        Task<ICollection<BookDto>> GetAllBooksAsync();
+
+        Task<ICollection<BookShortDetail>> GetShortDetailBooksAsync();
+        
         Task AddBookAsync(Book book);
 
-        Task RemoveBookAsync(Book book);
+        Task RemoveBookAsync(int id);
 
         Task UpdateBookAsync(Book book);
     }

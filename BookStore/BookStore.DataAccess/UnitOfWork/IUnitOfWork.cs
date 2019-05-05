@@ -11,6 +11,8 @@ namespace BookStore.DataAccess.UnitOfWork
         IAuthorRepository Authors { get; }
         ICommentRepository Comments { get; }
         ICategoryRepository Categories { get; }
+        IMarkRepository Marks { get; }
+        IWishRepository Wishes { get; }
         Task<int> SaveAsync();
     }
 }
