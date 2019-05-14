@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using BookStore.BusinessLogic.Interfaces;
+using BookStore.BusinessLogic.Models;
 using BookStore.DataAccess.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,7 +32,7 @@ namespace BookStore.Controllers
         }
 
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "CategoryById")]
         public async Task<IActionResult> GetCategory(int id)
         {
             var category = await _categoryService.GetCategoryAsync(id);
@@ -45,15 +47,23 @@ namespace BookStore.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> AddCategory([FromBody] CategoryDto category)
+        public async Task<IActionResult> CreateCategory([FromBody] CategoryDto category)
         {
-            if (ModelState.IsValid)
+            try
             {
-                await _categoryService.AddCategoryAsync(category);
-                return Ok();
-            }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest("Invalid model object");
+                }
 
-            return BadRequest(ModelState);
+                await _categoryService.AddCategoryAsync(category);
+
+                return CreatedAtRoute("CategoryById", new {id = category.Id}, category);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpPut("{id}")]

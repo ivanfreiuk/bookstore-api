@@ -14,9 +14,7 @@ namespace BookStore.DataAccess.Context
         public DbSet<Comment> Comments { get; set; }
 
         public DbSet<Category> Categories { get; set; }
-
-        public DbSet<Mark> Marks { get; set; }
-
+        
         public DbSet<Wish> Wishes { get; set; }
 
         public StoreDbContext(DbContextOptions<StoreDbContext> options)
@@ -67,15 +65,7 @@ namespace BookStore.DataAccess.Context
             });
 
             #endregion
-
-            #region Mark
-
-            builder.Entity<Mark>().HasKey(w => new
-            {
-                w.BookId, w.UserId
-            });
-
-            #endregion
+            
         }
     }
 }

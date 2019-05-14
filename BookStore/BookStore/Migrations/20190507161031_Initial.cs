@@ -288,6 +288,7 @@ namespace BookStore.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Headline = table.Column<string>(nullable: true),
                     Content = table.Column<string>(nullable: true),
                     PublicationDate = table.Column<DateTime>(nullable: false),
                     BookId = table.Column<int>(nullable: false),

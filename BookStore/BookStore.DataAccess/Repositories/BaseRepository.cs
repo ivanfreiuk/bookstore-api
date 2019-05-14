@@ -35,17 +35,17 @@ namespace BookStore.DataAccess.Repositories
 
         public virtual async Task AddAsync(TEntity entity)
         {
-            await _context.Set<TEntity>().AddAsync(entity);
+           await _context.Set<TEntity>().AddAsync(entity);
         }
 
         public virtual async Task AddRangeAsync(ICollection<TEntity> entities)
         {
-           await _context.Set<TEntity>().AddRangeAsync(entities);
+            await _context.Set<TEntity>().AddRangeAsync(entities);
         }
 
         public virtual async Task RemoveAsync(TEntity entity)
         {
-            _context.Set<TEntity>().Remove(entity);
+             _context.Set<TEntity>().Remove(entity);
         }
 
         public virtual async Task RemoveRangeAsync(ICollection<TEntity> entities)
@@ -55,7 +55,7 @@ namespace BookStore.DataAccess.Repositories
 
         public virtual async Task UpdateAsync(TEntity entity)
         {
-            _context.Set<TEntity>().Update(entity);
+             _context.Set<TEntity>().Update(entity);
         }
 
         public void Dispose()

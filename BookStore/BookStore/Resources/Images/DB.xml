@@ -1,0 +1,34 @@
+<!DOCTYPE Insurer-Objects [
+<!ELEMENT Insurer-Objects (Insurer*, Object*)>
+<!ELEMENT Insurer (Name,Surname,Address)>
+<!ELEMENT Name (#PCDATA)>
+<!ELEMENT Surname (#PCDATA)>
+<!ELEMENT Address (City,Street)>
+<!ELEMENT City (#PCDATA)>
+<!ELEMENT Street (#PCDATA)>
+<!ATTLIST Insurer InsurerId ID #REQUIRED>
+<!ATTLIST Insurer Insured IDREFS #REQUIRED>
+<!ELEMENT Object (Title,Description)>
+<!ELEMENT Title (#PCDATA)>
+<!ELEMENT Description (#PCDATA)>
+<!ATTLIST Object ObjectId ID #REQUIRED>
+<!ATTLIST Object InsurerI IDREF #REQUIRED>
+]>
+<Insurer-Objects>
+	<Insurer InsurerId="ik" Insured ="o1 o2">
+		<Name> Inna</Name>
+		<Surname> Kalyniak</Surname>
+		<Address> 
+			<City> Lviv</City>
+			<Street>Pasichna str </Street>
+		</Address>
+	</Insurer>
+	<Object ObjectId="o1" InsurerI="ik">
+		<Title>Car </Title>
+		<Description> Ford C-Max 2014 year</Description>
+	</Object>
+	<Object ObjectId="o2" InsurerI="ik">
+		<Title>Laptop </Title>
+		<Description> Apple MacBook 2018 year</Description>
+	</Object>
+</Insurer-Objects>

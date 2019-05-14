@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using BookStore.BusinessLogic.Models;
 
 namespace BookStore.BusinessLogic.Interfaces
 {

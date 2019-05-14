@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using BookStore.BusinessLogic.Interfaces;
 using BookStore.BusinessLogic.Models;
 using BookStore.DataAccess.Entities;
 using BookStore.DataAccess.UnitOfWork;
-using Remotion.Linq.Utilities;
 
 namespace BookStore.BusinessLogic.Services
 {
@@ -32,34 +28,62 @@ namespace BookStore.BusinessLogic.Services
 
         public async Task<ICollection<BookDto>> GetAllBooksAsync()
         {
-            var bookEnteties = await _uow.Books.GetAllAsync();
+            var bookEntities = await _uow.Books.GetAllAsync();
 
-            var bookDtos = _mapper.Map<ICollection<Book>, ICollection<BookDto>>(bookEnteties);
+            var bookDtos = _mapper.Map<IEnumerable<Book>, ICollection<BookDto>>(bookEntities);
 
             return bookDtos;
         }
 
-        public async Task<ICollection<BookShortDetail>> GetShortDetailBooksAsync()
+        public async Task<ICollection<BookDto>> GetBooksByCategoryId(int categoryId)
         {
-            var books = await _uow.Books.GetAllAsync();
+            var bookEntities = await _uow.Books.GetBooksByCategoryId(categoryId);
 
-            var shortDetails = books.Select(i => new BookShortDetail
-            {
-                Id = i.Id,
-                ImageUrl = i.ImageUrl,
-                Title = i.Title,
-                Price = i.Price,
-                BookAuthors = i.BookAuthors
-            });
+            var bookDtos = _mapper.Map<IEnumerable<Book>, ICollection<BookDto>>(bookEntities);
 
-            return shortDetails.ToList();
+            return bookDtos;
         }
-        
-        public async Task AddBookAsync(Book book)
+
+        public async Task<ICollection<BookDto>> GetBooksByTitle(string title)
         {
-            await _uow.Books.AddAsync(book);
+            var bookEntities = await _uow.Books.GetBooksByTitle(title);
+
+            var bookDtos = _mapper.Map<IEnumerable<Book>, ICollection<BookDto>>(bookEntities);
+
+            return bookDtos;
+        }
+
+        public async Task AddBookAsync(BookDto book)
+        {
+            var bookEntity = _mapper.Map<BookDto, Book>(book);
+            await _uow.Books.AddAsync(bookEntity);
+            await _uow.SaveAsync();
+
+            var bookFromDb = await _uow.Books.GetAsync(bookEntity.Id);
+
+            foreach (var category in book.Categories)
+            {
+                bookFromDb.BookCategories.Add(new BookCategory
+                {
+                    BookId = bookFromDb.Id,
+                    CategoryId = category.Id
+                });
+            }
+
+            foreach (var author in book.Authors)
+            {
+                bookFromDb.BookAuthors.Add(new BookAuthor()
+                {
+                    BookId = bookFromDb.Id,
+                    AuthorId = author.Id
+                });
+            }
+
+            await _uow.Books.UpdateAsync(bookFromDb);
 
             await _uow.SaveAsync();
+
+            book.Id = bookEntity.Id;
         }
 
         public async Task RemoveBookAsync(int id)
@@ -71,11 +95,14 @@ namespace BookStore.BusinessLogic.Services
             await _uow.SaveAsync();
         }
 
-        public async Task UpdateBookAsync(Book book)
+        public async Task UpdateBookAsync(BookDto book)
         {
-            await _uow.Books.UpdateAsync(book);
+            var bookEntity = _mapper.Map<BookDto, Book>(book);
+
+            await _uow.Books.UpdateAsync(bookEntity);
 
             await _uow.SaveAsync();
         }
+        
     }
 }

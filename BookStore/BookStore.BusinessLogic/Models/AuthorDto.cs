@@ -1,4 +1,4 @@
-﻿namespace BookStore.DataAccess.Entities
+﻿namespace BookStore.BusinessLogic.Models
 {
     public class AuthorDto
     {

@@ -15,7 +15,7 @@ namespace BookStore.BusinessLogic.Models
 
         public decimal Price { get; set; }
 
-        public int Mark { get; set; }
+        public double Mark { get; set; }
 
         public string Language { get; set; }
 

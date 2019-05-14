@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace BookStore.DataAccess.Entities
+﻿namespace BookStore.BusinessLogic.Models
 {
     public class CategoryDto
     {

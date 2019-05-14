@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using BookStore.BusinessLogic.Models;
 using BookStore.DataAccess.Entities;
 using BookStore.DataAccess.UnitOfWork;
 
@@ -12,7 +13,7 @@ namespace BookStore.BusinessLogic.Services
 {
     public class CategoryService: BaseService, ICategoryService
     {
-        private IMapper _mapper;
+        private readonly IMapper _mapper;
 
         public CategoryService(IUnitOfWork uow, IMapper mapper) : base(uow)
         {
@@ -44,6 +45,7 @@ namespace BookStore.BusinessLogic.Services
             await _uow.Categories.AddAsync(categoryEntity);
 
             await _uow.SaveAsync();
+            category.Id = categoryEntity.Id;
         }
 
         public async Task RemoveCategoryAsync(int id)

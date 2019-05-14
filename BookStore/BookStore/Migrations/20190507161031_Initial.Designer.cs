@@ -4,14 +4,16 @@ using BookStore.DataAccess.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BookStore.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    partial class StoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190507161031_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -106,8 +108,6 @@ namespace BookStore.Migrations
 
                     b.Property<string>("Headline");
 
-                    b.Property<int>("Mark");
-
                     b.Property<DateTime>("PublicationDate");
 
                     b.Property<int>("UserId");
@@ -119,6 +119,19 @@ namespace BookStore.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("BookStore.DataAccess.Entities.Mark", b =>
+                {
+                    b.Property<int>("BookId");
+
+                    b.Property<int>("UserId");
+
+                    b.Property<int>("MarkValue");
+
+                    b.HasKey("BookId", "UserId");
+
+                    b.ToTable("Marks");
                 });
 
             modelBuilder.Entity("BookStore.DataAccess.Entities.Wish", b =>
@@ -336,7 +349,7 @@ namespace BookStore.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("BookStore.DataAccess.Identity.User", "User")
-                        .WithMany("Comments")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

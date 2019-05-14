@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Collections.Generic;
+using BookStore.DataAccess.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace BookStore.DataAccess.Identity
 {
@@ -12,6 +14,6 @@ namespace BookStore.DataAccess.Identity
 
         public int? RoleId { get; set; }
 
-        public virtual Role Role { get; set; }
+        public Role Role { get; set; }
     }
 }

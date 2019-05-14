@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using BookStore.BusinessLogic.Models;
-using BookStore.DataAccess.Entities;
 
 namespace BookStore.BusinessLogic.Interfaces
 {
@@ -13,12 +10,14 @@ namespace BookStore.BusinessLogic.Interfaces
 
         Task<ICollection<BookDto>> GetAllBooksAsync();
 
-        Task<ICollection<BookShortDetail>> GetShortDetailBooksAsync();
-        
-        Task AddBookAsync(Book book);
+        Task<ICollection<BookDto>> GetBooksByTitle(string title);
+
+        Task AddBookAsync(BookDto book);
 
         Task RemoveBookAsync(int id);
 
-        Task UpdateBookAsync(Book book);
+        Task UpdateBookAsync(BookDto book);
+
+        Task<ICollection<BookDto>> GetBooksByCategoryId(int categoryId);
     }
 }

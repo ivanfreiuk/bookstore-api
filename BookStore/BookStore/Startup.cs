@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 using AutoMapper;
 using BookStore.BusinessLogic.Interfaces;
 using BookStore.BusinessLogic.Models;
@@ -12,11 +13,13 @@ using BookStore.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 
 namespace BookStore
@@ -95,7 +98,9 @@ namespace BookStore
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IBookService, BookService>();
+            services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IAuthorService, AuthorService>();
             services.AddScoped<TokenHelper>();
 
             #endregion
@@ -105,12 +110,10 @@ namespace BookStore
             var serviceProvider = services.BuildServiceProvider();
             AutoMapper.Mapper.Initialize(cfg =>
             {
-                cfg.CreateMap<Author, AuthorDto>();
-                cfg.CreateMap<AuthorDto, Author>();
-                cfg.CreateMap<Category, CategoryDto>();
-                cfg.CreateMap<CategoryDto, Category>();
-                cfg.CreateMap<Book, BookDto>();
+                cfg.AddProfile<AuthorProfile>();
+                cfg.AddProfile<CategoryProfile>();
                 cfg.AddProfile(new BookProfile(serviceProvider.GetService<IUnitOfWork>()));
+                cfg.AddProfile(new CommentProfile(serviceProvider.GetService<IUnitOfWork>()));
             });
 
             services.AddSingleton(Mapper.Instance);
@@ -136,7 +139,14 @@ namespace BookStore
                 .AllowAnyHeader());
 
             app.UseAuthentication();
-            
+
+            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"Resources")),
+                RequestPath = new PathString("/Resources")
+            });
+
             app.UseHttpsRedirection();
             app.UseMvc();
         }

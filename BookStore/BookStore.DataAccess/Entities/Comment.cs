@@ -7,6 +7,10 @@ namespace BookStore.DataAccess.Entities
     {
         public int Id { get; set; }
 
+        public string Headline { get; set; }
+
+        public int Mark { get; set; }
+
         public string Content { get; set; }
 
         public DateTime PublicationDate { get; set; }

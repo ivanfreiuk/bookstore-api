@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookStore.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    [Migration("20190504163401_Initial")]
-    partial class Initial
+    [Migration("20190507164023_CommentMarkAdded")]
+    partial class CommentMarkAdded
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -105,6 +105,10 @@ namespace BookStore.Migrations
                     b.Property<int>("BookId");
 
                     b.Property<string>("Content");
+
+                    b.Property<string>("Headline");
+
+                    b.Property<int>("Mark");
 
                     b.Property<DateTime>("PublicationDate");
 
@@ -347,7 +351,7 @@ namespace BookStore.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("BookStore.DataAccess.Identity.User", "User")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
