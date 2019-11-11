@@ -1,32 +1,48 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using BookStore.BusinessLogic.Interfaces;
 using BookStore.DataAccess.Identity;
+using BookStore.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStore.Controllers
 {
-    //[Authorize]
-    [Route("api/[controller]")]
+    [Route("api/users")]
     [ApiController]
     public class UsersController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
+        private readonly IUserService _userService;
 
-        public UsersController(UserManager<User> userManager)
+        public UsersController(UserManager<User> userManager, IUserService userService)
         {
             _userManager = userManager;
+            _userService = userService;
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var users = await _userManager.Users.AllAsync(i => true);
+            var usersFromDb = await _userManager.Users.ToListAsync();
+
+            var users = usersFromDb.Select(u => new UserModel
+            {
+                Id = u.Id,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Email = u.Email,
+                RoleName = _userService.GetUserRolesAsync(u.Id).Result.Select(r => r.Name).FirstOrDefault()
+
+            });
+
             return Ok(users);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetUsers(int id)
+        public async Task<IActionResult> GetUser(int id)
         {
             var user = await _userManager.Users.FirstOrDefaultAsync(u=> u.Id == id);
 
@@ -43,6 +59,27 @@ namespace BookStore.Controllers
             }
 
             return Ok(user);
+        }
+
+        [HttpPut("role/{role}")]
+        public async Task<IActionResult> ChangeUserRole([FromBody] UserModel user, string role)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            
+            var userFromDb = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
+            if (userFromDb == null)
+            {
+                return BadRequest("User does not exists.");
+            }
+
+            var oldRoleName = user.RoleName;
+            if (oldRoleName != role)
+            {
+                await _userManager.RemoveFromRoleAsync(userFromDb, oldRoleName);
+                await _userManager.AddToRoleAsync(userFromDb, role);
+            }
+
+            return NoContent();
         }
     }
 }

@@ -17,12 +17,16 @@ namespace BookStore.DataAccess.Context
         
         public DbSet<Wish> Wishes { get; set; }
 
+        public DbSet<CartItem> CartItems { get; set; }
+
+        public DbSet<Order> Orders { get; set; }
+
         public StoreDbContext(DbContextOptions<StoreDbContext> options)
             : base(options)
         {
             Database.EnsureCreated();
         }
-
+        
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

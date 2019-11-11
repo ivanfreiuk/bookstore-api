@@ -121,25 +121,19 @@ namespace BookStore.Controllers
         //    return BadRequest(ModelState);
         //}
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateBook([FromBody] UpdateBookModel model)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateBook(int id, BookDto book)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var bookFromDb = _bookService.GetBookAsync(id);
+            if (bookFromDb == null)
             {
-                var book = new BookDto
-                {
-                    //ImageUrl = model.ImageUrl,
-                    //Title = model.Title,
-                    //Price = model.Price,
-                    //Language = model.Language,
-                    //PageSize = model.PageSize,
-                    //Description = model.Description
-                };
-                await _bookService.UpdateBookAsync(book);
-                return Ok();
+                return NotFound();
             }
 
-            return BadRequest(ModelState);
+          // TODO  await _bookService.UpdateBookAsync(book);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]

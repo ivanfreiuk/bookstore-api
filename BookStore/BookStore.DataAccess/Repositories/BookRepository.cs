@@ -25,7 +25,7 @@ namespace BookStore.DataAccess.Repositories
                 .Include(b => b.BookCategories)
                 .ThenInclude(c => c.Category)
                 .Include(b => b.Comments)
-                .FirstAsync(i => i.Id == id);
+                .FirstOrDefaultAsync(i => i.Id == id);
         }
 
         public override async Task<ICollection<Book>> GetAllAsync()
@@ -58,6 +58,21 @@ namespace BookStore.DataAccess.Repositories
                 .Include(b => b.Comments)
                 .Where(b => b.Title.Equals(title, StringComparison.OrdinalIgnoreCase))
                 .ToListAsync();
+        }
+
+        public override async Task UpdateAsync(Book book)
+        {
+            var bookFromDb = await _context.Books.FirstOrDefaultAsync(b=> b.Id==book.Id);
+
+            bookFromDb.Title = book.Title;
+            bookFromDb.Price = book.Price;
+            bookFromDb.Description = book.Description;
+            bookFromDb.ImageUrl = book.ImageUrl;
+            bookFromDb.Language = book.Language;
+            bookFromDb.CommentsEnabled = book.CommentsEnabled;
+            bookFromDb.PageSize = book.PageSize;
+
+            _context.Books.Update(bookFromDb);
         }
     }
 }

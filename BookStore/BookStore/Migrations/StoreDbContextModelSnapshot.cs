@@ -38,6 +38,8 @@ namespace BookStore.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<bool>("CommentsEnabled");
+
                     b.Property<string>("Description");
 
                     b.Property<string>("ImageUrl");
@@ -81,6 +83,33 @@ namespace BookStore.Migrations
                     b.ToTable("BookCategory");
                 });
 
+            modelBuilder.Entity("BookStore.DataAccess.Entities.CartItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BookId");
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<bool>("IsOrdered");
+
+                    b.Property<int?>("OrderId");
+
+                    b.Property<int>("Quantity");
+
+                    b.Property<int>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("CartItems");
+                });
+
             modelBuilder.Entity("BookStore.DataAccess.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -121,13 +150,38 @@ namespace BookStore.Migrations
                     b.ToTable("Comments");
                 });
 
+            modelBuilder.Entity("BookStore.DataAccess.Entities.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedDate");
+
+                    b.Property<int>("Status");
+
+                    b.Property<int>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Orders");
+                });
+
             modelBuilder.Entity("BookStore.DataAccess.Entities.Wish", b =>
                 {
                     b.Property<int>("BookId");
 
                     b.Property<int>("UserId");
 
+                    b.Property<int>("Id");
+
+                    b.Property<int>("Quantity");
+
                     b.HasKey("BookId", "UserId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Wishes");
                 });
@@ -186,8 +240,6 @@ namespace BookStore.Migrations
 
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256);
-
-                    b.Property<string>("Password");
 
                     b.Property<string>("PasswordHash");
 
@@ -328,6 +380,18 @@ namespace BookStore.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("BookStore.DataAccess.Entities.CartItem", b =>
+                {
+                    b.HasOne("BookStore.DataAccess.Entities.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("BookStore.DataAccess.Entities.Order")
+                        .WithMany("CartItems")
+                        .HasForeignKey("OrderId");
+                });
+
             modelBuilder.Entity("BookStore.DataAccess.Entities.Comment", b =>
                 {
                     b.HasOne("BookStore.DataAccess.Entities.Book", "Book")
@@ -336,14 +400,35 @@ namespace BookStore.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("BookStore.DataAccess.Identity.User", "User")
-                        .WithMany("Comments")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("BookStore.DataAccess.Entities.Order", b =>
+                {
+                    b.HasOne("BookStore.DataAccess.Identity.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("BookStore.DataAccess.Entities.Wish", b =>
+                {
+                    b.HasOne("BookStore.DataAccess.Entities.Book", "Book")
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("BookStore.DataAccess.Identity.User", "User")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("BookStore.DataAccess.Identity.User", b =>
                 {
-                    b.HasOne("BookStore.DataAccess.Identity.Role", "Role")
+                    b.HasOne("BookStore.DataAccess.Identity.Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId");
                 });

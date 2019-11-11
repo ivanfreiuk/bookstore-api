@@ -14,6 +14,9 @@ namespace BookStore.DataAccess.UnitOfWork
         private ICategoryRepository _categoryRepository;
         private ICommentRepository _commentRepository;
         private IWishRepository _wishRepository;
+        private IOrderRepository _orderRepository;
+        private ICartItemRepository _cartItemRepository;
+
         private readonly StoreDbContext _context;
         private bool disposed;
 
@@ -34,6 +37,10 @@ namespace BookStore.DataAccess.UnitOfWork
         public ICategoryRepository Categories => _categoryRepository ?? (_categoryRepository = new CategoryRepository(_context));
 
         public IWishRepository Wishes => _wishRepository ?? (_wishRepository = new WishRepository(_context));
+
+        public IOrderRepository Orders => _orderRepository ?? (_orderRepository = new OrderRepository(_context));
+
+        public ICartItemRepository CartItems => _cartItemRepository ?? (_cartItemRepository = new CartItemRepository(_context));
 
         public async Task<int> SaveAsync()
         {

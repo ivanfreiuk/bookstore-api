@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using BookStore.DataAccess.Repositories.Interfaces;
 
 namespace BookStore.DataAccess.Entities
 {
-    public class Book
+    public class Book: IIdentifier
     {
         public int Id { get; set; }
 
@@ -17,6 +18,8 @@ namespace BookStore.DataAccess.Entities
         public string Description { get; set; }
 
         public int PageSize { get; set; }
+
+        public bool CommentsEnabled { get; set; }
 
         public ICollection<Comment> Comments { get; set; }
 

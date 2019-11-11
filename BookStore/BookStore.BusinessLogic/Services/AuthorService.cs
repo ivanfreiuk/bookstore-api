@@ -5,6 +5,7 @@ using BookStore.BusinessLogic.Interfaces;
 using BookStore.BusinessLogic.Models;
 using BookStore.DataAccess.Entities;
 using BookStore.DataAccess.UnitOfWork;
+using BookStore.Helpers;
 
 namespace BookStore.BusinessLogic.Services
 {
@@ -12,9 +13,9 @@ namespace BookStore.BusinessLogic.Services
     {
         private readonly IMapper _mapper;
 
-        public AuthorService(IUnitOfWork uow, IMapper mapper) : base(uow)
+        public AuthorService(IUnitOfWork uow, IMapperFactory factory) : base(uow)
         {
-            _mapper = mapper;
+            _mapper = factory.CreateMapper();
         }
 
         public async Task<AuthorDto> GetAuthorAsync(int id)

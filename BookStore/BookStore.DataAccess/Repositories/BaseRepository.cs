@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookStore.DataAccess.Repositories
 {
-    public class BaseRepository<TEntity> : IDisposable, IGenericRepository<TEntity> where TEntity: class
+    public abstract class BaseRepository<TEntity> : IDisposable, IGenericRepository<TEntity> where TEntity: class
     {
         protected readonly StoreDbContext _context;
 
@@ -55,7 +55,7 @@ namespace BookStore.DataAccess.Repositories
 
         public virtual async Task UpdateAsync(TEntity entity)
         {
-             _context.Set<TEntity>().Update(entity);
+            _context.Set<TEntity>().Update(entity);
         }
 
         public void Dispose()

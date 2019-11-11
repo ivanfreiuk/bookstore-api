@@ -47,12 +47,21 @@ namespace BookStore.Controllers
                     return BadRequest();
                 }
 
-                var user = await _userManager.FindByNameAsync(model.Email);
+                var user= await _userManager.FindByNameAsync(model.Email);
+                
+
 
                 var response = new
                 {
                     access_token = GetToken(user),
-                    user = await _userManager.FindByEmailAsync(model.Email)
+                    user = new UserModel
+                    {
+                        Id = user.Id,
+                        RoleName = _userManager.GetRolesAsync(user).Result.Single(),
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email
+                    }
                 };
 
                 return Ok(response);
@@ -94,6 +103,8 @@ namespace BookStore.Controllers
                 var identityResult = await _userManager.CreateAsync(user, model.Password);
                 if (identityResult.Succeeded)
                 {
+                    await _userManager.AddToRoleAsync(user, "User");
+
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return Ok(GetToken(user));
                 }

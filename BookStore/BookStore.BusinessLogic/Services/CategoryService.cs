@@ -8,6 +8,7 @@ using AutoMapper;
 using BookStore.BusinessLogic.Models;
 using BookStore.DataAccess.Entities;
 using BookStore.DataAccess.UnitOfWork;
+using BookStore.Helpers;
 
 namespace BookStore.BusinessLogic.Services
 {
@@ -15,9 +16,9 @@ namespace BookStore.BusinessLogic.Services
     {
         private readonly IMapper _mapper;
 
-        public CategoryService(IUnitOfWork uow, IMapper mapper) : base(uow)
+        public CategoryService(IUnitOfWork uow, IMapperFactory factory) : base(uow)
         {
-            _mapper = mapper;
+            _mapper = factory.CreateMapper();
         }
 
         public async Task<CategoryDto> GetCategoryAsync(int id)

@@ -69,20 +69,27 @@ namespace BookStore.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAuthor(int id, [FromBody] AuthorDto author)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var authorDto = await _authorService.GetAuthorAsync(id);
-
-                if (authorDto == null)
+                if (ModelState.IsValid)
                 {
-                    return NotFound();
+                    var authorDto = await _authorService.GetAuthorAsync(id);
+
+                    if (authorDto == null)
+                    {
+                        return NotFound();
+                    }
+
+                    await _authorService.UpdateAuthorAsync(author);
+                    return Ok();
                 }
 
-                await _authorService.UpdateAuthorAsync(author);
-                return Ok();
+                return BadRequest(ModelState);
             }
-
-            return BadRequest(ModelState);
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
         }
 
 

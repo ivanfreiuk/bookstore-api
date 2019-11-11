@@ -1,9 +1,10 @@
 ﻿using System;
 using BookStore.DataAccess.Identity;
+using BookStore.DataAccess.Repositories.Interfaces;
 
 namespace BookStore.DataAccess.Entities
 {
-    public class Comment
+    public class Comment: IIdentifier
     {
         public int Id { get; set; }
 

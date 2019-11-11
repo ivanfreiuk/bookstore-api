@@ -5,5 +5,9 @@
         public int UserId { get; set; }
 
         public int BookId { get; set; }
+
+        public BookDto Book { get; set; }
+
+        public int BookCount { get; set; }
     }
 }

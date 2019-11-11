@@ -23,6 +23,8 @@ namespace BookStore.BusinessLogic.Models
 
         public int PageSize { get; set; }
 
+        public bool CommentsEnabled { get; set; }
+
         public ICollection<AuthorDto> Authors { get; set; }
 
         public ICollection<CategoryDto> Categories { get; set; }

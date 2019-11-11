@@ -1,5 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using AutoMapper;
 using BookStore.BusinessLogic.Interfaces;
 using BookStore.BusinessLogic.Models;
@@ -21,6 +25,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using AutoMapper;
+using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 
 namespace BookStore
 {
@@ -44,8 +50,10 @@ namespace BookStore
             #region Add Entity Framework and Identity Framework
 
             services.AddDbContext<StoreDbContext>(options =>
+            {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
-                    b => b.MigrationsAssembly("BookStore")));
+                    b => b.MigrationsAssembly("BookStore"));
+            });
 
             services.AddIdentity<User, Role>(options =>
             {
@@ -94,15 +102,17 @@ namespace BookStore
 
             #region Add DI for application services
 
-
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IBookService, BookService>();
-            services.AddScoped<ICommentService, CommentService>();
-            services.AddScoped<ICategoryService, CategoryService>();
-            services.AddScoped<IAuthorService, AuthorService>();
-            services.AddScoped<TokenHelper>();
-
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IBookService, BookService>();
+            services.AddTransient<ICommentService, CommentService>();
+            services.AddTransient<ICategoryService, CategoryService>();
+            services.AddTransient<IAuthorService, AuthorService>();
+            services.AddTransient<IWishService, WishService>();
+            services.AddTransient<ICartItemService, CartItemService>();
+            services.AddTransient<IOrderService, OrderService>();
+            services.AddTransient<IMapperFactory, MapperFactory>();
+            
             #endregion
 
             #region AutoMapper
@@ -112,16 +122,20 @@ namespace BookStore
             {
                 cfg.AddProfile<AuthorProfile>();
                 cfg.AddProfile<CategoryProfile>();
+                cfg.AddProfile<WishProfile>();
+                cfg.AddProfile<OrderProfile>();
+                cfg.AddProfile<CartItemProfile>();
                 cfg.AddProfile(new BookProfile(serviceProvider.GetService<IUnitOfWork>()));
                 cfg.AddProfile(new CommentProfile(serviceProvider.GetService<IUnitOfWork>()));
             });
 
-            services.AddSingleton(Mapper.Instance);
+          //  services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies(), ServiceLifetime.Scoped);
+         
 
             #endregion
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -147,8 +161,73 @@ namespace BookStore
                 RequestPath = new PathString("/Resources")
             });
 
+            
+           // CreateRoles(serviceProvider).Wait();
             app.UseHttpsRedirection();
             app.UseMvc();
+        }
+
+        private async Task CreateRoles(IServiceProvider serviceProvider)
+        {
+            //initializing custom roles   
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<Role>>();
+            var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
+            string[] roleNames = { "Admin", "User", "Manager" };
+            IdentityResult roleResult;
+
+            foreach (var roleName in roleNames)
+            {
+                var roleExist = await roleManager.RoleExistsAsync(roleName);
+                if (!roleExist)
+                {
+                    //create the roles and seed them to the database: Question 1  
+                    roleResult = await roleManager.CreateAsync(new Role
+                    {
+                        Name = roleName
+                    });
+                }
+            }
+
+            User user = await userManager.FindByEmailAsync("admin@gmail.com");
+
+            if (user == null)
+            {
+                user = new User()
+                {
+                    UserName = "admin@gmail.com",
+                    Email = "admin@gmail.com",
+                };
+                await userManager.CreateAsync(user, "Qwerty11");
+            }
+            await userManager.AddToRoleAsync(user, "Admin");
+
+
+            var user1 = await userManager.FindByEmailAsync("manager@gmail.com");
+
+            if (user1 == null)
+            {
+                user1 = new User()
+                {
+                    UserName = "manager@gmail.com",
+                    Email = "manager@gmail.com",
+                };
+                await userManager.CreateAsync(user1, "Qwerty11");
+            }
+            await userManager.AddToRoleAsync(user1, "Manager");
+
+            var user2 = await userManager.FindByEmailAsync("user@gmail.com");
+
+            if (user2 == null)
+            {
+                user2 = new User()
+                {
+                    UserName = "user@gmail.com",
+                    Email = "user@gmail.com",
+                };
+                await userManager.CreateAsync(user2, "Qwerty11");
+            }
+            await userManager.AddToRoleAsync(user2, "User");
+
         }
     }
 }

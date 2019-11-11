@@ -11,8 +11,9 @@ namespace BookStore.BusinessLogic.Interfaces
     {
         Task<User> GetUserAsync(int id);
         Task<ICollection<User>> GetAllUsersAsync();
-        Task<ICollection<User>> FindAsync(Expression<Func<User, bool>> predicate);
 
+        Task<ICollection<Role>> GetUserRolesAsync(int userId);
+        
         Task AddUserAsync(User user);
 
         Task RemoveUserAsync(User user);
